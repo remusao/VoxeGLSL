@@ -1,5 +1,5 @@
-#ifndef ENGINE_HH_
-# define ENGINE_HH_
+#ifndef VOXEL_ENGINE_HH_
+# define VOXEL_ENGINE_HH_
 
 # include <vector>
 
@@ -9,13 +9,13 @@
 # include "shader.hh"
 # include "world.hh"
 
-class Engine
+class VoxelEngine
 {
     public:
-        Engine(const char* name,
+        VoxelEngine(const char* name,
                int width,
                int height);
-        ~Engine();
+        ~VoxelEngine();
 
         void mainloop();
 
@@ -43,4 +43,4 @@ class Engine
         World world_;
 };
 
-#endif /* !ENGINE_HH_ */
+#endif /* !VOXEL_ENGINE_HH_ */

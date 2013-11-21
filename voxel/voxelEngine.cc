@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "engine.hh"
+#include "voxelEngine.hh"
 #include "cube.hh"
 #include "exceptions.hh"
 
@@ -36,7 +36,7 @@ namespace
 
 }
 
-Engine::Engine(const char* name, int width, int height)
+VoxelEngine::VoxelEngine(const char* name, int width, int height)
     : name_(name),
       width_(width),
       height_(height)
@@ -81,7 +81,7 @@ Engine::Engine(const char* name, int width, int height)
 }
 
 
-Engine::~Engine()
+VoxelEngine::~VoxelEngine()
 {
     // Delete shaders
     glDeleteProgram(shaderProgram_);
@@ -95,7 +95,7 @@ Engine::~Engine()
 }
 
 
-void Engine::mainloop()
+void VoxelEngine::mainloop()
 {
     // Main loop
     while (!glfwWindowShouldClose(window_))
@@ -112,7 +112,7 @@ void Engine::mainloop()
 }
 
 
-void Engine::draw() const
+void VoxelEngine::draw() const
 {
     // Clear the screen to black
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -121,7 +121,7 @@ void Engine::draw() const
 }
 
 
-void Engine::init_buffers()
+void VoxelEngine::init_buffers()
 {
     // Load cube into buffer
     glGenVertexArrays(1, &vao_);
@@ -134,7 +134,7 @@ void Engine::init_buffers()
 }
 
 
-void Engine::init_shaders()
+void VoxelEngine::init_shaders()
 {
     // Create and compile shaders
     GLuint vertexShader = sm_.fromfile("shaders/vertex.shader", GL_VERTEX_SHADER);

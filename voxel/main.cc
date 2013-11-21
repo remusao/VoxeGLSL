@@ -1,8 +1,8 @@
-#include "engine.hh"
+#include "voxelEngine.hh"
 
 int main(void)
 {
-    Engine engine("Voxel", 1920, 1080);
+    VoxelEngine engine("Voxel", 1920, 1080);
 
     // Init world
     // TODO
