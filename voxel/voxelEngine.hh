@@ -4,7 +4,8 @@
 # include <vector>
 
 # include <GL/glew.h>
-# include <GLFW/glfw3.h>
+# include <SFML/Window.hpp>
+# include <SFML/OpenGL.hpp>
 
 # include <glm/glm.hpp>
 # include <glm/gtc/matrix_transform.hpp>
@@ -33,7 +34,7 @@ class VoxelEngine
         const char* name_;
         const int   width_;
         const int   height_;
-        GLFWwindow* window_;
+        sf::Window  window_;
 
         // Buffers
         GLuint vao_;
@@ -49,7 +50,6 @@ class VoxelEngine
         glm::mat4 projectionMatrix_; // Store the projection matrix
         glm::mat4 viewMatrix_; // Store the view matrix
         glm::mat4 modelMatrix_; // Store the model matrix
-        glm::mat4 pvm_;
 };
 
 #endif /* !VOXEL_ENGINE_HH_ */

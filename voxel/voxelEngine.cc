@@ -6,7 +6,7 @@
 
 namespace
 {
-    double calcFPS(double theTimeInterval = 1.0)
+/*    double calcFPS(double theTimeInterval = 1.0)
     {
         // Static values which only get initialised the first time the function runs
         static double t0Value       = glfwGetTime(); // Set the initial time to now
@@ -46,7 +46,7 @@ namespace
         // Return the current FPS - doesn't have to be used if you don't want it!
         return fps;
     }
-
+*/
     void init_rendering()
     {
         glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -81,46 +81,21 @@ VoxelEngine::VoxelEngine(const char* name, int width, int height)
     : name_(name),
       width_(width),
       height_(height),
+      window_(sf::VideoMode(width, height), "OpenGL", sf::Style::Fullscreen, sf::ContextSettings(32)),
       projectionMatrix_(glm::perspective(60.0f, (float)width / (float)height, 0.1f, 100.f)),
       viewMatrix_(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.f))),
       modelMatrix_(glm::scale(glm::mat4(1.0f), glm::vec3(0.5f)))
 {
-    pvm_ = projectionMatrix_ * viewMatrix_ * modelMatrix_;
-
-    // Version of OpenGL
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    // Init library
-    if (!glfwInit())
-    {
-        throw EngineException();
-    }
+    window_.setVerticalSyncEnabled(true);
 
     // Specify options to OpenGL
     init_rendering();
 
-    // Create window
-    window_ = glfwCreateWindow(width_, height_, name_, glfwGetPrimaryMonitor(), NULL);
-    if (!window_)
-    {
-        glfwTerminate();
-        throw EngineException();
-    }
-
-    // Make the window's context current
-    glfwMakeContextCurrent(window_);
-
-    // Init glew
     glewExperimental = GL_TRUE;
     glewInit();
 
     // Print infos about OpenGL version
     print_opengl_info();
-
-    // Set callbacks
-    glfwSetKeyCallback(window_, key_callback);
 
     init_buffers();
     init_shaders();
@@ -140,28 +115,37 @@ VoxelEngine::~VoxelEngine()
     // Delete buffers
     glDeleteBuffers(1, &vbo_);
     glDeleteVertexArrays(1, &vao_);
-
-    glfwDestroyWindow(window_);
-    glfwTerminate();
 }
 
 
 void VoxelEngine::mainloop()
 {
-    // Main loop
-    while (!glfwWindowShouldClose(window_))
+    bool running = true;
+    while (running)
     {
-        calcFPS(1.0);
+        // handle events
+        sf::Event event;
+        while (window_.pollEvent(event))
+        {
+            switch (event.type)
+            {
+                case sf::Event::Closed:
+                    // end the program
+                    running = false;
+                    break;
+                case sf::Event::KeyPressed:
+                    if (event.key.code == sf::Keyboard::Escape)
+                        running = false;
+                    break;
+                    
+            }
+        }
 
         updateVBO();
-        // Draw world
         draw();
 
-        //display(world);
-        glfwSwapBuffers(window_);
-
-        /* Poll for and process events */
-        glfwPollEvents();
+        // end the current frame (internally swaps the front and back buffers)
+        window_.display();
     }
 }
 
@@ -226,8 +210,6 @@ void VoxelEngine::init_shaders()
     glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     // Set uniforms to use in shaders
-    int pvmLoc = glGetUniformLocation(shaderProgram_, "pvm");
-    glUniformMatrix4fv(pvmLoc, 1, GL_FALSE, &pvm_[0][0]);
     int pLoc = glGetUniformLocation(shaderProgram_, "p");
     glUniformMatrix4fv(pLoc, 1, GL_FALSE, &projectionMatrix_[0][0]);
     int vLoc = glGetUniformLocation(shaderProgram_, "v");
