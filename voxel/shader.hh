@@ -34,7 +34,7 @@ class GLProgram
         void reset();
         void init();
         void addShader(const char* file, GLenum type);
-        void addUniform(const char* name, float* mat);
+        void addUniform(const char* name, glm::mat4 mat);
         void addAttribute(const char* name, int, GLenum, bool, int, const GLvoid*);
         void finalize();
 

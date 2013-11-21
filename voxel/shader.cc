@@ -92,10 +92,10 @@ void GLProgram::addShader(const char* file, GLenum type)
     glAttachShader(program_, shader);
 }
 
-void GLProgram::addUniform(const char* name, float* mat)
+void GLProgram::addUniform(const char* name, glm::mat4 mat)
 {
     GLuint location = glGetUniformLocation(program_, name);
-    glUniformMatrix4fv(location, 1, GL_FALSE, mat);
+    glUniformMatrix4fv(location, 1, GL_FALSE, &mat[0][0]);
 }
 
 void GLProgram::addAttribute(

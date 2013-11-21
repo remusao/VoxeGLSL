@@ -2,9 +2,9 @@
 
 in vec3 position;
 
-uniform mat4 p, v, m;
+uniform mat4 camera, m;
 
 void main()
 {
-    gl_Position = p * v * m * vec4(position, 1.0);
+    gl_Position = camera * m * vec4(position, 1.0);
 }

@@ -40,6 +40,10 @@ VoxelEngine::VoxelEngine(const char* name, int width, int height)
     init_buffers();
     init_shaders();
 
+    // Init camera
+    camera_.setPosition(glm::vec3(0, 0, 5));
+    camera_.setViewportAspectRatio(window_.getSize().x / window_.getSize().y);
+
     // Populate world
     for (int i = 0; i < 100; ++i)
         for (int j = 0; j < 100; ++j)
@@ -57,6 +61,8 @@ VoxelEngine::~VoxelEngine()
 
 void VoxelEngine::mainloop()
 {
+    sf::Clock clock;
+    sf::Time elapsed = clock.getElapsedTime();
     bool running = true;
     while (running)
     {
@@ -64,36 +70,65 @@ void VoxelEngine::mainloop()
         sf::Event event;
         while (window_.pollEvent(event))
         {
-            if (!processEvent(event))
+            if (!processEvent(clock.getElapsedTime().asSeconds() - elapsed.asSeconds(), event))
             {
                 running = false;
                 break;
             }
         }
 
+        elapsed = clock.getElapsedTime();
+
         // Draw world
         updateVBO();
 
+        program_.addUniform("camera", camera_.matrix());
         glClearColor(0.4f, 0.6f, 0.9f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        glDrawArrays(GL_POINTS, 0, world_.size());
+        glDrawArrays(GL_LINE_LOOP, 0, world_.size());
 
         // swap buffers
         window_.display();
     }
 }
 
-bool VoxelEngine::processEvent(const sf::Event& e)
+bool VoxelEngine::processEvent(float elapsed, const sf::Event& e)
 {
+    const float moveSpeed = 2.0;
     if (e.type == sf::Event::Closed)
     {
         return false;
     }
     else if (e.type == sf::Event::KeyPressed)
     {
-        if (e.key.code == sf::Keyboard::Escape)
+        auto code = e.key.code;
+        if (code == sf::Keyboard::Escape)
         {
             return false;
+        }
+        else if (code == sf::Keyboard::S)
+        {
+            camera_.offsetPosition(elapsed * moveSpeed * -camera_.forward());
+        }
+        else if (code == sf::Keyboard::W)
+        {
+            camera_.offsetPosition(elapsed * moveSpeed * camera_.forward());
+        }
+        else if (code == sf::Keyboard::A)
+        {
+            camera_.offsetPosition(elapsed * moveSpeed * -camera_.right());
+        }
+        else if (code == sf::Keyboard::D)
+        {
+            camera_.offsetPosition(elapsed * moveSpeed * camera_.right());
+        }
+        else if (code == sf::Keyboard::Z)
+        {
+            camera_.offsetPosition(elapsed * moveSpeed * -glm::vec3(0, 1, 0));
+        }
+        else if (code == sf::Keyboard::X)
+        {
+            camera_.offsetPosition(elapsed * moveSpeed * glm::vec3(0, 1, 0));
         }
     }
     return true;
@@ -141,7 +176,6 @@ void VoxelEngine::init_shaders()
 
     program_.addAttribute("position", 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-    program_.addUniform("p", &projectionMatrix_[0][0]);
-    program_.addUniform("v", &viewMatrix_[0][0]);
-    program_.addUniform("m", &modelMatrix_[0][0]);
+    program_.addUniform("camera", camera_.matrix());
+    program_.addUniform("m", modelMatrix_);
 }
