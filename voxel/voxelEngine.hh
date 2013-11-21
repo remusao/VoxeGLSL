@@ -25,6 +25,7 @@ class VoxelEngine
 
     private:
 
+        bool processEvent(const sf::Event& e);
         void updateVBO();
         void draw() const;
         void init_buffers();
