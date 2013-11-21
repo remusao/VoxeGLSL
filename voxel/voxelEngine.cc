@@ -72,13 +72,23 @@ void VoxelEngine::mainloop()
         sf::Event event;
         while (window_.pollEvent(event))
         {
-            if (!processEvent(time.asSeconds() - elapsed.asSeconds(), event))
+            if (event.type == sf::Event::Closed)
             {
                 running = false;
                 break;
             }
+            else if (event.type == sf::Event::KeyPressed)
+            {
+                if (event.key.code == sf::Keyboard::Escape)
+                {
+                    running = false;
+                    break;
+                }
+            }
         }
 
+        // Process input
+        processInput(elapsed.asSeconds());
 
         // Update elapsed time
         elapsed = time;
@@ -99,54 +109,31 @@ void VoxelEngine::mainloop()
     }
 }
 
-bool VoxelEngine::processEvent(float elapsed, const sf::Event& e)
+void VoxelEngine::processInput(float elapsed)
 {
-    const float moveSpeed = 2.0;
-    if (e.type == sf::Event::Closed)
-    {
-        return false;
-    }
-    else if (e.type == sf::Event::KeyPressed)
-    {
-        switch (e.key.code)
-        {
-            default:
-                break;
-            case sf::Keyboard::Escape:
-                return false;
-            case sf::Keyboard::S:
-                camera_.offsetPosition(elapsed * moveSpeed * -camera_.forward());
-                break;
-            case sf::Keyboard::W:
-                camera_.offsetPosition(elapsed * moveSpeed * camera_.forward());
-                break;
-            case sf::Keyboard::A:
-                camera_.offsetPosition(elapsed * moveSpeed * -camera_.right());
-                break;
-            case sf::Keyboard::D:
-                camera_.offsetPosition(elapsed * moveSpeed * camera_.right());
-                break;
-            case sf::Keyboard::Z:
-                camera_.offsetPosition(elapsed * moveSpeed * -glm::vec3(0, 1, 0));
-                break;
-            case sf::Keyboard::X:
-                camera_.offsetPosition(elapsed * moveSpeed * glm::vec3(0, 1, 0));
-                break;
-            case sf::Keyboard::Up:
-                camera_.offsetOrientation(-moveSpeed, 0);
-                break;
-            case sf::Keyboard::Down:
-                camera_.offsetOrientation(moveSpeed, 0);
-                break;
-            case sf::Keyboard::Left:
-                camera_.offsetOrientation(0, -moveSpeed);
-                break;
-            case sf::Keyboard::Right:
-                camera_.offsetOrientation(0, moveSpeed);
-                break;
-        }
-    }
-    return true;
+    const float moveSpeed = 0.1;
+    const float rotationSpeed = 0.5;
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+        camera_.offsetPosition(elapsed * moveSpeed * -camera_.forward());
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+        camera_.offsetPosition(elapsed * moveSpeed * camera_.forward());
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+        camera_.offsetPosition(elapsed * moveSpeed * -camera_.right());
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+        camera_.offsetPosition(elapsed * moveSpeed * camera_.right());
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
+        camera_.offsetPosition(elapsed * moveSpeed * -glm::vec3(0, 1, 0));
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
+        camera_.offsetPosition(elapsed * moveSpeed * glm::vec3(0, 1, 0));
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+        camera_.offsetOrientation(-rotationSpeed, 0);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+        camera_.offsetOrientation(rotationSpeed, 0);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+        camera_.offsetOrientation(0, -rotationSpeed);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+        camera_.offsetOrientation(0, rotationSpeed);
 }
 
 void VoxelEngine::updateVBO()

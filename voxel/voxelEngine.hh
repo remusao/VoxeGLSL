@@ -26,7 +26,7 @@ class VoxelEngine
 
     private:
 
-        bool processEvent(float elapsed, const sf::Event& e);
+        void processInput(float elapsed);
         void updateVBO();
         void init_buffers();
         void init_shaders();
