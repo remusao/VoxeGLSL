@@ -45,9 +45,10 @@ VoxelEngine::VoxelEngine(const char* name, int width, int height)
     camera_.setViewportAspectRatio(window_.getSize().x / window_.getSize().y);
 
     // Populate world
-    for (int i = 0; i < 100; ++i)
-        for (int j = 0; j < 100; ++j)
+    for (int i = 0; i < 1000; ++i)
+        for (int j = 0; j < 1000; ++j)
             world_.addVoxel(Voxel(i, j, 0));
+    updateVBO();
 }
 
 
@@ -94,7 +95,7 @@ void VoxelEngine::mainloop()
         elapsed = time;
 
         // Update Vertex Buffer Object
-        updateVBO();
+        // updateVBO();
 
         // Update camera transformation
         program_.addUniform("camera", camera_.matrix());
@@ -114,22 +115,27 @@ void VoxelEngine::processInput(float elapsed)
     const float moveSpeed = 0.1;
     const float rotationSpeed = 0.5;
 
+    // Z-axis
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
         camera_.offsetPosition(elapsed * moveSpeed * -camera_.forward());
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
         camera_.offsetPosition(elapsed * moveSpeed * camera_.forward());
+    // Y-axis
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
         camera_.offsetPosition(elapsed * moveSpeed * -camera_.right());
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
         camera_.offsetPosition(elapsed * moveSpeed * camera_.right());
+    // X-axis
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
         camera_.offsetPosition(elapsed * moveSpeed * -glm::vec3(0, 1, 0));
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
         camera_.offsetPosition(elapsed * moveSpeed * glm::vec3(0, 1, 0));
+    // Rotation arround X-axis
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
         camera_.offsetOrientation(-rotationSpeed, 0);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
         camera_.offsetOrientation(rotationSpeed, 0);
+    // Rotation arround Y-axis
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
         camera_.offsetOrientation(0, -rotationSpeed);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
@@ -140,6 +146,8 @@ void VoxelEngine::updateVBO()
 {
     size_t size = world_.size() * 3;
     float* array = new float[size];
+
+    std::cout << "World size: " << size << " Voxels" << std::endl;
 
     // For each cube push its position
     for (size_t i = 0; i < world_.size(); ++i)

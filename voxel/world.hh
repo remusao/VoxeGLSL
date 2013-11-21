@@ -39,7 +39,7 @@ class World
         {
         }
 
-        std::vector<Voxel> voxels_;
+        std::vector<Voxel>  voxels_;
 };
 
 #endif /* !WORLD_HH_ */
