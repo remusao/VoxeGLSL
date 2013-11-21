@@ -45,9 +45,10 @@ VoxelEngine::VoxelEngine(const char* name, int width, int height)
     camera_.setViewportAspectRatio(window_.getSize().x / window_.getSize().y);
 
     // Populate world
-    for (int i = 0; i < 1000; ++i)
-        for (int j = 0; j < 1000; ++j)
-            world_.addVoxel(Voxel(i, j, 0));
+    for (int z = 0; z < 1000; ++z)
+        for (int i = 0; i < 100; ++i)
+            for (int j = 0; j < 100; ++j)
+                world_.addVoxel(Voxel(i, j, z));
     updateVBO();
 }
 
@@ -90,6 +91,9 @@ void VoxelEngine::mainloop()
 
         // Process input
         processInput(elapsed.asSeconds());
+
+        // frame per second
+        // float fps = 1.f / (time.asSeconds() - elapsed.asSeconds());
 
         // Update elapsed time
         elapsed = time;
