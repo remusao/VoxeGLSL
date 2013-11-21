@@ -39,7 +39,10 @@ namespace
 VoxelEngine::VoxelEngine(const char* name, int width, int height)
     : name_(name),
       width_(width),
-      height_(height)
+      height_(height),
+      projectionMatrix_(glm::perspective(60.0f, (float)width / (float)height, 0.1f, 100.f)),
+      viewMatrix_(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.f))),
+      modelMatrix_(glm::scale(glm::mat4(1.0f), glm::vec3(0.5f)))
 {
     // Version of OpenGL
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -115,8 +118,8 @@ void VoxelEngine::mainloop()
 void VoxelEngine::draw() const
 {
     // Clear the screen to black
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearColor(0.4f, 0.6f, 0.9f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
@@ -144,7 +147,7 @@ void VoxelEngine::init_shaders()
     shaderProgram_ = glCreateProgram();
     glAttachShader(shaderProgram_, vertexShader);
     glAttachShader(shaderProgram_, fragmentShader);
-    glBindFragDataLocation(shaderProgram_, 0, "outColor");
+    glBindFragDataLocation(shaderProgram_, 0, "color");
     glLinkProgram(shaderProgram_);
     glUseProgram(shaderProgram_);
     
@@ -152,13 +155,13 @@ void VoxelEngine::init_shaders()
     // Specify the layout of the vertex data
     GLint posAttrib = glGetAttribLocation(shaderProgram_, "position");
     glEnableVertexAttribArray(posAttrib);
-    glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), 0);
+    glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-    GLint colAttrib = glGetAttribLocation(shaderProgram_, "color");
-    glEnableVertexAttribArray(colAttrib);
-    glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+    int pLoc = glGetUniformLocation(shaderProgram_, "p"); // Get the location of our projection matrix in the shader
+    int vLoc = glGetUniformLocation(shaderProgram_, "v"); // Get the location of our view matrix in the shader
+    int mLoc = glGetUniformLocation(shaderProgram_, "m"); // Get the location of our model matrix in the shader
 
-    GLint texAttrib = glGetAttribLocation(shaderProgram_, "texcoord");
-    glEnableVertexAttribArray(texAttrib);
-    glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
+    glUniformMatrix4fv(pLoc, 1, GL_FALSE, &projectionMatrix_[0][0]); // Send our projection matrix to the shader
+    glUniformMatrix4fv(vLoc, 1, GL_FALSE, &viewMatrix_[0][0]); // Send our view matrix to the shader
+    glUniformMatrix4fv(mLoc, 1, GL_FALSE, &modelMatrix_[0][0]); // Send our model matrix to the shader
 }

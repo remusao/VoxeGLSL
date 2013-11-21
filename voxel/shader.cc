@@ -1,4 +1,5 @@
 #include <fstream>
+#include <iostream>
 
 #include "shader.hh"
 #include "exceptions.hh"
@@ -45,6 +46,11 @@ GLuint ShaderManager::fromstring(const char* program, GLenum shaderType)
     glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
     if (!status)
     {
+        // Display error message
+        char buffer[512];
+        glGetShaderInfoLog(shader, 512, NULL, buffer);
+        std::cerr << "Error while compiling shader" << std::endl;
+        std::cerr << buffer << std::endl;
         throw ShaderException();
     }
 

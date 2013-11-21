@@ -6,6 +6,9 @@
 # include <GL/glew.h>
 # include <GLFW/glfw3.h>
 
+# include <glm/glm.hpp>
+# include <glm/gtc/matrix_transform.hpp>
+
 # include "shader.hh"
 # include "world.hh"
 
@@ -27,8 +30,8 @@ class VoxelEngine
 
         // Window
         const char* name_;
-        int         width_;
-        int         height_;
+        const int   width_;
+        const int   height_;
         GLFWwindow* window_;
 
         // Buffers
@@ -41,6 +44,10 @@ class VoxelEngine
 
         // World
         World world_;
+
+        glm::mat4 projectionMatrix_; // Store the projection matrix
+        glm::mat4 viewMatrix_; // Store the view matrix
+        glm::mat4 modelMatrix_; // Store the model matrix
 };
 
 #endif /* !VOXEL_ENGINE_HH_ */
