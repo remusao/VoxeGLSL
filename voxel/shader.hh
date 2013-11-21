@@ -25,11 +25,4 @@ class ShaderManager
         std::vector<GLuint> shaders_;
 };
 
-
-namespace shader
-{
-    extern const GLchar* vertex;
-    extern const GLchar* fragment;
-}
-
 #endif /* !SHADER_HH_ */

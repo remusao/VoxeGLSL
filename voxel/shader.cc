@@ -1,3 +1,5 @@
+#include <fstream>
+
 #include "shader.hh"
 #include "exceptions.hh"
 
@@ -13,9 +15,22 @@ ShaderManager::~ShaderManager()
     }
 }
 
-GLuint ShaderManager::fromfile(const char*, GLenum)
+GLuint ShaderManager::fromfile(const char* file, GLenum shaderType)
 {
-    return 0;
+    std::ifstream in{file};
+
+    if (in.good())
+    {
+        std::string contents;
+        in.seekg(0, std::ios::end);
+        contents.resize(in.tellg());
+        in.seekg(0, std::ios::beg);
+        in.read(&contents[0], contents.size());
+        in.close();
+
+        return fromstring(contents.c_str(), shaderType);
+    }
+    throw ShaderException();
 }
 
 GLuint ShaderManager::fromstring(const char* program, GLenum shaderType)
@@ -37,44 +52,4 @@ GLuint ShaderManager::fromstring(const char* program, GLenum shaderType)
     shaders_.emplace_back(shader);
 
     return shader;
-}
-
-
-
-namespace shader
-{
-    // Vertex shader
-    const GLchar* vertex = R"(
-        #version 150 core
-
-        in vec3 position;
-        in vec3 color;
-        in vec2 texcoord;
-
-        out vec3 Color;
-        out vec2 Texcoord;
-
-        void main()
-        {
-            Color = color;
-            Texcoord = texcoord;
-            gl_Position = vec4(position, 1.0);
-        }
-    )";
-
-    // Fragment shader
-    const GLchar* fragment = R"(
-        #version 150 core
-
-        in vec3 Color;
-        in vec2 TexCoord;
-
-        out vec4 outColor;
-
-        void main()
-        {
-            outColor = vec4(1.0, 1.0, 1.0, 1.0);
-        }
-    )";
-
 }

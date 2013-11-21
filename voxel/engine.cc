@@ -137,8 +137,8 @@ void Engine::init_buffers()
 void Engine::init_shaders()
 {
     // Create and compile shaders
-    GLuint vertexShader = sm_.fromstring(shader::vertex, GL_VERTEX_SHADER);
-    GLuint fragmentShader = sm_.fromstring(shader::fragment, GL_FRAGMENT_SHADER);
+    GLuint vertexShader = sm_.fromfile("shaders/vertex.shader", GL_VERTEX_SHADER);
+    GLuint fragmentShader = sm_.fromfile("shaders/fragment.shader", GL_FRAGMENT_SHADER);
 
     // Link the vertex and fragment shader into a shader program
     shaderProgram_ = glCreateProgram();
