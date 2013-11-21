@@ -10,6 +10,7 @@
 # include <glm/glm.hpp>
 # include <glm/gtc/matrix_transform.hpp>
 
+# include "camera.hh"
 # include "shader.hh"
 # include "world.hh"
 
@@ -27,23 +28,21 @@ class VoxelEngine
 
         bool processEvent(const sf::Event& e);
         void updateVBO();
-        void draw() const;
         void init_buffers();
         void init_shaders();
 
         // Window
-        const char* name_;
-        const int   width_;
-        const int   height_;
         sf::Window  window_;
+
+        // Camera
+        Camera camera_;
 
         // Buffers
         GLuint vao_;
         GLuint vbo_;
 
         // Shaders
-        ShaderManager sm_;
-        GLuint shaderProgram_;
+        GLProgram program_;
 
         // World
         World world_;

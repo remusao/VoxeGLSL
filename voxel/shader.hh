@@ -3,6 +3,7 @@
 
 # include <vector>
 # include <GL/glew.h>
+# include <glm/glm.hpp>
 
 class ShaderManager
 {
@@ -21,6 +22,25 @@ class ShaderManager
 
     private:
         std::vector<GLuint> shaders_;
+};
+
+
+class GLProgram
+{
+    public:
+        GLProgram();
+        ~GLProgram();
+
+        void reset();
+        void init();
+        void addShader(const char* file, GLenum type);
+        void addUniform(const char* name, float* mat);
+        void addAttribute(const char* name, int, GLenum, bool, int, const GLvoid*);
+        void finalize();
+
+    private:
+        GLuint          program_;
+        ShaderManager   sm_;
 };
 
 #endif /* !SHADER_HH_ */

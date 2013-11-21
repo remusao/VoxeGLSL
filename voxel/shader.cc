@@ -59,3 +59,61 @@ GLuint ShaderManager::fromstring(const char* program, GLenum shaderType)
 
     return shader;
 }
+
+
+//
+// GLProgram
+//
+
+GLProgram::GLProgram()
+{
+}
+
+GLProgram::~GLProgram()
+{
+    glDeleteProgram(program_);
+}
+
+void GLProgram::reset()
+{
+    glDeleteProgram(program_);
+    program_ = glCreateProgram();
+    sm_ = ShaderManager();
+}
+
+void GLProgram::init()
+{
+    program_ = glCreateProgram();
+}
+
+void GLProgram::addShader(const char* file, GLenum type)
+{
+    GLuint shader = sm_.fromfile(file, type);
+    glAttachShader(program_, shader);
+}
+
+void GLProgram::addUniform(const char* name, float* mat)
+{
+    GLuint location = glGetUniformLocation(program_, name);
+    glUniformMatrix4fv(location, 1, GL_FALSE, mat);
+}
+
+void GLProgram::addAttribute(
+    const char* name,
+    int size,
+    GLenum type,
+    bool normalize,
+    int stride,
+    const GLvoid* offset)
+{
+    GLint posAttrib = glGetAttribLocation(program_, name);
+    glEnableVertexAttribArray(posAttrib);
+    glVertexAttribPointer(posAttrib, size, type, normalize, stride, offset);
+}
+
+void GLProgram::finalize()
+{
+    glBindFragDataLocation(program_, 0, "color");
+    glLinkProgram(program_);
+    glUseProgram(program_);
+}

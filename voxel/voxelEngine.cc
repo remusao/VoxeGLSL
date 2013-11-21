@@ -6,42 +6,37 @@
 
 namespace
 {
-    void init_rendering()
-    {
-        glClearColor(0.0, 0.0, 0.0, 0.0);
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc (GL_LESS);
-    }
-
     void print_opengl_info()
     {
-        const GLubyte* renderer = glGetString (GL_RENDERER); // get renderer string
-        const GLubyte* version = glGetString (GL_VERSION); // version as a string
+        const GLubyte* renderer = glGetString(GL_RENDERER);
+        const GLubyte* version = glGetString(GL_VERSION);
         std::cout << "Renderer: " << renderer << std::endl;
         std::cout << "OpenGL version: " << version << std::endl;
     }
 }
 
 VoxelEngine::VoxelEngine(const char* name, int width, int height)
-    : name_(name),
-      width_(width),
-      height_(height),
-      window_(sf::VideoMode(width, height), "OpenGL", sf::Style::Default, sf::ContextSettings(32)),
+    : window_(sf::VideoMode(width, height), name, sf::Style::Default, sf::ContextSettings(32)),
       projectionMatrix_(glm::perspective(60.0f, (float)width / (float)height, 0.1f, 100.f)),
       viewMatrix_(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.f))),
       modelMatrix_(glm::scale(glm::mat4(1.0f), glm::vec3(0.5f)))
 {
+    // Window options
     window_.setVerticalSyncEnabled(true);
 
-    // Specify options to OpenGL
-    init_rendering();
-
+    // Init Glew
     glewExperimental = GL_TRUE;
     glewInit();
+
+    // Specify options to OpenGL
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc (GL_LESS);
 
     // Print infos about OpenGL version
     print_opengl_info();
 
+    // Init buffers and shaders
+    program_.init();
     init_buffers();
     init_shaders();
 
@@ -54,9 +49,6 @@ VoxelEngine::VoxelEngine(const char* name, int width, int height)
 
 VoxelEngine::~VoxelEngine()
 {
-    // Delete shaders
-    glDeleteProgram(shaderProgram_);
-
     // Delete buffers
     glDeleteBuffers(1, &vbo_);
     glDeleteVertexArrays(1, &vao_);
@@ -81,7 +73,10 @@ void VoxelEngine::mainloop()
 
         // Draw world
         updateVBO();
-        draw();
+
+        glClearColor(0.4f, 0.6f, 0.9f, 0.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        glDrawArrays(GL_POINTS, 0, world_.size());
 
         // swap buffers
         window_.display();
@@ -108,6 +103,7 @@ void VoxelEngine::updateVBO()
 {
     size_t size = world_.size() * 3;
     float* array = new float[size];
+
     // For each cube push its position
     for (size_t i = 0; i < world_.size(); ++i)
     {
@@ -120,14 +116,6 @@ void VoxelEngine::updateVBO()
     // Fill VBO with cube vertices
     glBufferData(GL_ARRAY_BUFFER, size * sizeof (float), array, GL_STATIC_DRAW);
     delete [] array;
-}
-
-void VoxelEngine::draw() const
-{
-    // Clear the screen to black
-    glClearColor(0.4f, 0.6f, 0.9f, 0.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    glDrawArrays(GL_LINE_LOOP, 0, world_.size());
 }
 
 
@@ -145,30 +133,15 @@ void VoxelEngine::init_buffers()
 
 void VoxelEngine::init_shaders()
 {
-    // Create and compile shaders
-    GLuint vertexShader = sm_.fromfile("shaders/vertex.shader", GL_VERTEX_SHADER);
-    GLuint fragmentShader = sm_.fromfile("shaders/fragment.shader", GL_FRAGMENT_SHADER);
-    // GLuint geometryShader = sm_.fromfile("shaders/fragment.shader", GL_GEOMETRY_SHADER);
+    program_.addShader("shaders/vertex.shader", GL_VERTEX_SHADER);
+    program_.addShader("shaders/fragment.shader", GL_FRAGMENT_SHADER);
+    // program_.addShader("shaders/geometry.shader", GL_GEOMETRY_SHADER);
 
-    // Link the vertex and fragment shader into a shader program
-    shaderProgram_ = glCreateProgram();
-    glAttachShader(shaderProgram_, vertexShader);
-    glAttachShader(shaderProgram_, fragmentShader);
-    // glAttachShader(shaderProgram_, geometryShader);
-    glBindFragDataLocation(shaderProgram_, 0, "color");
-    glLinkProgram(shaderProgram_);
-    glUseProgram(shaderProgram_);
-    
-    // Specify the layout of the vertex data
-    GLint posAttrib = glGetAttribLocation(shaderProgram_, "position");
-    glEnableVertexAttribArray(posAttrib);
-    glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    program_.finalize();
 
-    // Set uniforms to use in shaders
-    int pLoc = glGetUniformLocation(shaderProgram_, "p");
-    glUniformMatrix4fv(pLoc, 1, GL_FALSE, &projectionMatrix_[0][0]);
-    int vLoc = glGetUniformLocation(shaderProgram_, "v");
-    glUniformMatrix4fv(vLoc, 1, GL_FALSE, &viewMatrix_[0][0]);
-    int mLoc = glGetUniformLocation(shaderProgram_, "m");
-    glUniformMatrix4fv(mLoc, 1, GL_FALSE, &modelMatrix_[0][0]);
+    program_.addAttribute("position", 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+    program_.addUniform("p", &projectionMatrix_[0][0]);
+    program_.addUniform("v", &viewMatrix_[0][0]);
+    program_.addUniform("m", &modelMatrix_[0][0]);
 }
