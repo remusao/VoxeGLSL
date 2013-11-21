@@ -66,23 +66,30 @@ void VoxelEngine::mainloop()
     bool running = true;
     while (running)
     {
+        sf::Time time = clock.getElapsedTime();
+
         // handle events
         sf::Event event;
         while (window_.pollEvent(event))
         {
-            if (!processEvent(clock.getElapsedTime().asSeconds() - elapsed.asSeconds(), event))
+            if (!processEvent(time.asSeconds() - elapsed.asSeconds(), event))
             {
                 running = false;
                 break;
             }
         }
 
-        elapsed = clock.getElapsedTime();
 
-        // Draw world
+        // Update elapsed time
+        elapsed = time;
+
+        // Update Vertex Buffer Object
         updateVBO();
 
+        // Update camera transformation
         program_.addUniform("camera", camera_.matrix());
+
+        // Draw
         glClearColor(0.4f, 0.6f, 0.9f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         glDrawArrays(GL_LINE_LOOP, 0, world_.size());
@@ -101,34 +108,42 @@ bool VoxelEngine::processEvent(float elapsed, const sf::Event& e)
     }
     else if (e.type == sf::Event::KeyPressed)
     {
-        auto code = e.key.code;
-        if (code == sf::Keyboard::Escape)
+        switch (e.key.code)
         {
-            return false;
-        }
-        else if (code == sf::Keyboard::S)
-        {
-            camera_.offsetPosition(elapsed * moveSpeed * -camera_.forward());
-        }
-        else if (code == sf::Keyboard::W)
-        {
-            camera_.offsetPosition(elapsed * moveSpeed * camera_.forward());
-        }
-        else if (code == sf::Keyboard::A)
-        {
-            camera_.offsetPosition(elapsed * moveSpeed * -camera_.right());
-        }
-        else if (code == sf::Keyboard::D)
-        {
-            camera_.offsetPosition(elapsed * moveSpeed * camera_.right());
-        }
-        else if (code == sf::Keyboard::Z)
-        {
-            camera_.offsetPosition(elapsed * moveSpeed * -glm::vec3(0, 1, 0));
-        }
-        else if (code == sf::Keyboard::X)
-        {
-            camera_.offsetPosition(elapsed * moveSpeed * glm::vec3(0, 1, 0));
+            default:
+                break;
+            case sf::Keyboard::Escape:
+                return false;
+            case sf::Keyboard::S:
+                camera_.offsetPosition(elapsed * moveSpeed * -camera_.forward());
+                break;
+            case sf::Keyboard::W:
+                camera_.offsetPosition(elapsed * moveSpeed * camera_.forward());
+                break;
+            case sf::Keyboard::A:
+                camera_.offsetPosition(elapsed * moveSpeed * -camera_.right());
+                break;
+            case sf::Keyboard::D:
+                camera_.offsetPosition(elapsed * moveSpeed * camera_.right());
+                break;
+            case sf::Keyboard::Z:
+                camera_.offsetPosition(elapsed * moveSpeed * -glm::vec3(0, 1, 0));
+                break;
+            case sf::Keyboard::X:
+                camera_.offsetPosition(elapsed * moveSpeed * glm::vec3(0, 1, 0));
+                break;
+            case sf::Keyboard::Up:
+                camera_.offsetOrientation(-moveSpeed, 0);
+                break;
+            case sf::Keyboard::Down:
+                camera_.offsetOrientation(moveSpeed, 0);
+                break;
+            case sf::Keyboard::Left:
+                camera_.offsetOrientation(0, -moveSpeed);
+                break;
+            case sf::Keyboard::Right:
+                camera_.offsetOrientation(0, moveSpeed);
+                break;
         }
     }
     return true;
