@@ -19,10 +19,13 @@ class Voxel
         ~Voxel() = default;
 
         // Getters
-        glm::vec3 pos() const { return pos_; }
+        glm::vec3 getPos() const { return pos_; }
+        float getx() const { return pos_.x; }
+        float gety() const { return pos_.y; }
+        float getz() const { return pos_.z; }
 
         // Setters
-        void pos(const glm::vec3& pos) { pos_ = pos; }
+        void setPos(const glm::vec3& pos) { pos_ = pos; }
 
     private:
         glm::vec3 pos_;

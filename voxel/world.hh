@@ -23,6 +23,16 @@ class World
             voxels_.push_back(vox);
         }
 
+        Voxel getVoxel(size_t i) const
+        {
+            return voxels_[i];
+        }
+
+        size_t size() const
+        {
+            return voxels_.size();
+        }
+
     private:
 
         void drawVoxel(const Voxel&) const
