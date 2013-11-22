@@ -11,8 +11,23 @@ uniform mat4 camera, m;
 void main ()
 {
     mat4 pvm = camera * m;
-    float y = gl_in[0].gl_Position.y;
-    gsColor = vec4(y, y, y, 1.0);
+    float y = (m * gl_in[0].gl_Position).y;
+    if (y < 2)
+    {
+        gsColor = vec4(0.0, 0.0, 1.0, 1.0);
+    }
+    else if (y < 50)
+    {
+        gsColor = vec4(0.0, y / 100.0, 0.0, 1.0);
+    }
+    else if (y < 100)
+    {
+        gsColor = vec4(y / 255.0, y / 255.0, y / 255.0, 1.0);
+    }
+    else
+    {
+        gsColor = vec4(1, 1, 1, 1);
+    }
 
     // Front
     gl_Position = pvm * gl_in[0].gl_Position;
