@@ -3,11 +3,16 @@
 layout (points) in;
 layout (triangle_strip, max_vertices = 24) out;
 
+in vec4 vsColor[];
+out vec4 gsColor;
+
 uniform mat4 camera, m;
 
 void main ()
 {
     mat4 pvm = camera * m;
+    float y = gl_in[0].gl_Position.y;
+    gsColor = vec4(y, y, y, 1.0);
 
     // Front
     gl_Position = pvm * gl_in[0].gl_Position;
