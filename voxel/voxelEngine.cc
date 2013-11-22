@@ -50,28 +50,11 @@ VoxelEngine::VoxelEngine(const char* name, int width, int height)
     img.loadFromFile("map.png");
     sf::Vector2u size = img.getSize();
 
-    auto higher = [&img](unsigned i, unsigned j) -> bool
-    {
-        unsigned z = img.getPixel(i, j).r;
-        return img.getPixel(i + 1, j).r < z
-            || img.getPixel(i, j + 1).r < z
-            || img.getPixel(i - 1, j).r < z
-            || img.getPixel(i, j - 1).r < z;
-    };
-
     for (unsigned i = 1; i < (size.x - 1); ++i)
     {
         for (unsigned j = 1; j < (size.y - 1); ++j)
         {
-            if (higher(i, j))
-            {
-                for (unsigned z = 0; z < (unsigned)img.getPixel(i, j).r; ++z)
-                    world_.addVoxel(Voxel(i, z, j));
-            }
-            else
-            {
-                world_.addVoxel(Voxel(i, (unsigned)img.getPixel(i, j).r, j));
-            }
+            world_.addVoxel(Voxel(i, (unsigned)img.getPixel(i, j).r, j));
         }
     }
     updateVBO();
@@ -127,8 +110,8 @@ void VoxelEngine::mainloop()
         // Update Vertex Buffer Object
         // updateVBO();
 
-        // Update camera transformation
-        program_.addUniform("camera", camera_.matrix());
+        // Update model view projection matrix
+        program_.addUniform("mvp", camera_.matrix() * modelMatrix_);
 
         // Draw
         glClearColor(0.4f, 0.6f, 0.9f, 0.0f);
@@ -150,21 +133,25 @@ void VoxelEngine::processInput(float elapsed)
         camera_.offsetPosition(elapsed * moveSpeed * -camera_.forward());
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
         camera_.offsetPosition(elapsed * moveSpeed * camera_.forward());
+
     // Y-axis
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
         camera_.offsetPosition(elapsed * moveSpeed * -camera_.right());
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
         camera_.offsetPosition(elapsed * moveSpeed * camera_.right());
+
     // X-axis
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
         camera_.offsetPosition(elapsed * moveSpeed * -glm::vec3(0, 1, 0));
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
         camera_.offsetPosition(elapsed * moveSpeed * glm::vec3(0, 1, 0));
+
     // Rotation arround X-axis
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
         camera_.offsetOrientation(-rotationSpeed, 0);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
         camera_.offsetOrientation(rotationSpeed, 0);
+
     // Rotation arround Y-axis
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
         camera_.offsetOrientation(0, -rotationSpeed);
@@ -216,7 +203,4 @@ void VoxelEngine::init_shaders()
     program_.finalize();
 
     program_.addAttribute("position", 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-    program_.addUniform("camera", camera_.matrix());
-    program_.addUniform("m", modelMatrix_);
 }
