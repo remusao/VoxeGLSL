@@ -1,15 +1,22 @@
+#include <iostream>
 #include "voxelEngine.hh"
 
 
-int main(void)
+int main(int argc, char* argv[])
 {
+    if (argc != 2)
+    {
+        std::cout << argv[0] << " heightmap.png" << std::endl;
+        return -1;
+    }
+
     VoxelEngine engine("Voxel", 1920, 1080);
 
     // Populate world
-    engine.populate([](World& world)
+    engine.populate([argv](World& world)
     {
         sf::Image img;
-        img.loadFromFile("map2.png");
+        img.loadFromFile(argv[1]);
         sf::Vector2u size = img.getSize();
 
         auto lowest = [&img](unsigned i, unsigned j, unsigned z)
