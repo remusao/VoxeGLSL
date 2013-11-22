@@ -47,14 +47,39 @@ VoxelEngine::VoxelEngine(const char* name, int width, int height)
     camera_.setNearAndFarPlanes(0.01, 3000.0);
 
     sf::Image img;
-    img.loadFromFile("map.png");
+    img.loadFromFile("map2.png");
     sf::Vector2u size = img.getSize();
+
+    auto lowest = [&img](unsigned i, unsigned j, unsigned z)
+    {
+        int neighbor[4][2] =
+        {
+            {1, 0},
+            {0, 1},
+            {-1, 0},
+            {0, -1}
+        };
+        unsigned min = z;
+        for (int n = 0; n < 4; ++n)
+        {
+            if (min > img.getPixel(i + neighbor[n][0], j + neighbor[n][1]).r)
+            {
+                min = img.getPixel(i + neighbor[n][0], j + neighbor[n][1]).r;
+            }
+        }
+        return min;
+    };
 
     for (unsigned i = 1; i < (size.x - 1); ++i)
     {
         for (unsigned j = 1; j < (size.y - 1); ++j)
         {
-            world_.addVoxel(Voxel(i, (unsigned)img.getPixel(i, j).r, j));
+            unsigned height = img.getPixel(i, j).r;
+            unsigned low = lowest(i, j, height);
+            for (unsigned z = low; z <= height; ++z)
+            {
+                world_.addVoxel(Voxel(i, z, j));
+            }
         }
     }
     updateVBO();
