@@ -44,11 +44,17 @@ VoxelEngine::VoxelEngine(const char* name, int width, int height)
     camera_.setPosition(glm::vec3(0, 0, 5));
     camera_.setViewportAspectRatio(window_.getSize().x / window_.getSize().y);
 
-    // Populate world
-    for (int z = 0; z < 1000; ++z)
-        for (int i = 0; i < 100; ++i)
-            for (int j = 0; j < 100; ++j)
-                world_.addVoxel(Voxel(i, j, z));
+    sf::Image img;
+    img.loadFromFile("map.png");
+    sf::Vector2u size = img.getSize();
+
+    for (unsigned i = 0; i < size.x; ++i)
+    {
+        for (unsigned j = 0; j < size.y; ++j)
+        {
+            world_.addVoxel(Voxel(i, (unsigned)img.getPixel(i, j).r, j));
+        }
+    }
     updateVBO();
 }
 
@@ -107,7 +113,7 @@ void VoxelEngine::mainloop()
         // Draw
         glClearColor(0.4f, 0.6f, 0.9f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        glDrawArrays(GL_LINE_LOOP, 0, world_.size());
+        glDrawArrays(GL_POINTS, 0, world_.size());
 
         // swap buffers
         window_.display();
@@ -152,6 +158,7 @@ void VoxelEngine::updateVBO()
     float* array = new float[size];
 
     std::cout << "World size: " << size << " Voxels" << std::endl;
+    std::cout << "=> " << size * 12 << " triangles" << std::endl;
 
     // For each cube push its position
     for (size_t i = 0; i < world_.size(); ++i)
@@ -184,7 +191,7 @@ void VoxelEngine::init_shaders()
 {
     program_.addShader("shaders/vertex.shader", GL_VERTEX_SHADER);
     program_.addShader("shaders/fragment.shader", GL_FRAGMENT_SHADER);
-    // program_.addShader("shaders/geometry.shader", GL_GEOMETRY_SHADER);
+    program_.addShader("shaders/geometry.shader", GL_GEOMETRY_SHADER);
 
     program_.finalize();
 

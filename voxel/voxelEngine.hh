@@ -5,6 +5,7 @@
 
 # include <GL/glew.h>
 # include <SFML/Window.hpp>
+# include <SFML/Graphics.hpp>
 # include <SFML/OpenGL.hpp>
 
 # include <glm/glm.hpp>
