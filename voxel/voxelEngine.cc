@@ -50,11 +50,28 @@ VoxelEngine::VoxelEngine(const char* name, int width, int height)
     img.loadFromFile("map.png");
     sf::Vector2u size = img.getSize();
 
-    for (unsigned i = 0; i < size.x; ++i)
+    auto higher = [&img](unsigned i, unsigned j) -> bool
     {
-        for (unsigned j = 0; j < size.y; ++j)
+        unsigned z = img.getPixel(i, j).r;
+        return img.getPixel(i + 1, j).r < z
+            || img.getPixel(i, j + 1).r < z
+            || img.getPixel(i - 1, j).r < z
+            || img.getPixel(i, j - 1).r < z;
+    };
+
+    for (unsigned i = 1; i < (size.x - 1); ++i)
+    {
+        for (unsigned j = 1; j < (size.y - 1); ++j)
         {
-            world_.addVoxel(Voxel(i, (unsigned)img.getPixel(i, j).r, j));
+            if (higher(i, j))
+            {
+                for (unsigned z = 0; z < (unsigned)img.getPixel(i, j).r; ++z)
+                    world_.addVoxel(Voxel(i, z, j));
+            }
+            else
+            {
+                world_.addVoxel(Voxel(i, (unsigned)img.getPixel(i, j).r, j));
+            }
         }
     }
     updateVBO();
