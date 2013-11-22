@@ -2,6 +2,7 @@
 # define VOXEL_ENGINE_HH_
 
 # include <vector>
+# include <functional>
 
 # include <GL/glew.h>
 # include <SFML/Window.hpp>
@@ -23,7 +24,11 @@ class VoxelEngine
                int height);
         ~VoxelEngine();
 
-        void mainloop();
+        // Populate world with Voxels
+        void populate(std::function<void(World&)>);
+
+        // Main Loop (update world at each loop and redraw if needed)
+        void loop(std::function<bool(World&)>);
 
     private:
 
@@ -48,9 +53,7 @@ class VoxelEngine
         // World
         World world_;
 
-        glm::mat4 projectionMatrix_; // Store the projection matrix
-        glm::mat4 viewMatrix_; // Store the view matrix
-        glm::mat4 modelMatrix_; // Store the model matrix
+        glm::mat4 modelMatrix_; // Store the projection matrix
 };
 
 #endif /* !VOXEL_ENGINE_HH_ */

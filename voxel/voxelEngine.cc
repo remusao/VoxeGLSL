@@ -16,10 +16,9 @@ namespace
     }
 }
 
+
 VoxelEngine::VoxelEngine(const char* name, int width, int height)
     : window_(sf::VideoMode(width, height), name, sf::Style::Default, sf::ContextSettings(32)),
-      projectionMatrix_(glm::perspective(60.0f, (float)width / (float)height, 0.1f, 100.f)),
-      viewMatrix_(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.f))),
       modelMatrix_(glm::scale(glm::mat4(1.0f), glm::vec3(0.5f)))
 {
     // Window options
@@ -45,44 +44,6 @@ VoxelEngine::VoxelEngine(const char* name, int width, int height)
     camera_.setPosition(glm::vec3(0, 0, 5));
     camera_.setViewportAspectRatio(window_.getSize().x / window_.getSize().y);
     camera_.setNearAndFarPlanes(0.01, 3000.0);
-
-    sf::Image img;
-    img.loadFromFile("map2.png");
-    sf::Vector2u size = img.getSize();
-
-    auto lowest = [&img](unsigned i, unsigned j, unsigned z)
-    {
-        int neighbor[4][2] =
-        {
-            {1, 0},
-            {0, 1},
-            {-1, 0},
-            {0, -1}
-        };
-        unsigned min = z;
-        for (int n = 0; n < 4; ++n)
-        {
-            if (min > img.getPixel(i + neighbor[n][0], j + neighbor[n][1]).r)
-            {
-                min = img.getPixel(i + neighbor[n][0], j + neighbor[n][1]).r;
-            }
-        }
-        return min;
-    };
-
-    for (unsigned i = 1; i < (size.x - 1); ++i)
-    {
-        for (unsigned j = 1; j < (size.y - 1); ++j)
-        {
-            unsigned height = img.getPixel(i, j).r;
-            unsigned low = lowest(i, j, height);
-            for (unsigned z = low; z <= height; ++z)
-            {
-                world_.addVoxel(Voxel(i, z, j));
-            }
-        }
-    }
-    updateVBO();
 }
 
 
@@ -93,12 +54,18 @@ VoxelEngine::~VoxelEngine()
     glDeleteVertexArrays(1, &vao_);
 }
 
+void VoxelEngine::populate(std::function<void(World&)> init)
+{
+    init(world_);
+    updateVBO();
+}
 
-void VoxelEngine::mainloop()
+void VoxelEngine::loop(std::function<bool(World&)> update)
 {
     sf::Clock clock;
     sf::Time elapsed = clock.getElapsedTime();
     bool running = true;
+
     while (running)
     {
         sf::Time time = clock.getElapsedTime();
@@ -124,6 +91,12 @@ void VoxelEngine::mainloop()
 
         // Process input
         processInput(elapsed.asSeconds());
+
+        // Update world
+        if (update(world_))
+        {
+            updateVBO();
+        }
 
         // frame per second
         // float fps = 1.f / (time.asSeconds() - elapsed.asSeconds());
