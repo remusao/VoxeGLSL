@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 
 #include "voxelEngine.hh"
 #include "cube.hh"
@@ -43,6 +44,7 @@ VoxelEngine::VoxelEngine(const char* name, int width, int height)
     // Init camera
     camera_.setPosition(glm::vec3(0, 0, 5));
     camera_.setViewportAspectRatio(window_.getSize().x / window_.getSize().y);
+    camera_.setNearAndFarPlanes(0.01, 3000.0);
 
     sf::Image img;
     img.loadFromFile("map.png");
@@ -100,6 +102,7 @@ void VoxelEngine::mainloop()
 
         // frame per second
         // float fps = 1.f / (time.asSeconds() - elapsed.asSeconds());
+        // std::cout << fps << std::endl;
 
         // Update elapsed time
         elapsed = time;
