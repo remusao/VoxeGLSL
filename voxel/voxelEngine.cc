@@ -117,7 +117,7 @@ void VoxelEngine::mainloop()
 void VoxelEngine::processInput(float elapsed)
 {
     const float moveSpeed = 0.1;
-    const float rotationSpeed = 0.5;
+    const float rotationSpeed = 1.0;
 
     // Z-axis
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
