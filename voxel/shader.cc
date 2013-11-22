@@ -44,12 +44,12 @@ GLuint ShaderManager::fromstring(const char* program, GLenum shaderType)
     // Check compilation status
     GLint status;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
-    if (!status)
+    if (status != GL_TRUE)
     {
         // Display error message
+        std::cerr << "Error while compiling shader" << std::endl;
         char buffer[512];
         glGetShaderInfoLog(shader, 512, NULL, buffer);
-        std::cerr << "Error while compiling shader" << std::endl;
         std::cerr << buffer << std::endl;
         throw ShaderException();
     }
@@ -116,4 +116,16 @@ void GLProgram::finalize()
     glBindFragDataLocation(program_, 0, "color");
     glLinkProgram(program_);
     glUseProgram(program_);
+
+    // Check linking
+    GLint status;
+    glGetProgramiv(program_, GL_LINK_STATUS, &status);
+    if (status != GL_TRUE)
+    {
+        std::cerr << "Failed to link program" << std::endl;
+        GLchar log[512];
+        glGetProgramInfoLog(program_, 512, NULL, log);
+        std::cerr << log << std::endl;
+        throw ShaderException();
+    }
 }
