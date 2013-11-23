@@ -32,9 +32,6 @@ VoxelEngine::VoxelEngine(const char* name, int width, int height)
     // Specify options to OpenGL
     glEnable(GL_DEPTH_TEST);
     glDepthFunc (GL_LESS);
-    glDepthMask(GL_TRUE);
-    glEnable(GL_CULL_FACE);
-    glDisable(GL_BLEND);
 
     // Print infos about OpenGL version
     print_opengl_info();
@@ -101,6 +98,10 @@ void VoxelEngine::loop(std::function<bool(World&)> update)
         // Process input
         processInput(elapsed.asSeconds());
 
+        // Update frustum
+        // frustum_.setCamInternals(camera_.fieldOfView(), camera_.viewportAspectRatio(), camera_.nearPlane(), camera_.farPlane());
+        // frustum_.setCamDef(camera_.position(), glm::vec3(0.0f, 0.0f, 0.0f), camera_.up());
+
         // Update world
         if (update(world_))
         {
@@ -119,6 +120,7 @@ void VoxelEngine::loop(std::function<bool(World&)> update)
 
         // Update model view projection matrix
         program_.addUniform("mvp", camera_.matrix() * modelMatrix_);
+        program_.addUniform("normal", camera_.forward());
 
         // Draw
         glClearColor(0.4f, 0.6f, 0.9f, 0.0f);
@@ -168,8 +170,8 @@ void VoxelEngine::processInput(float elapsed)
 
 void VoxelEngine::updateVBO()
 {
-    size_t size = world_.size() * 3;
-    float* array = new float[size];
+    float* array = new float[world_.size() * 3];
+    size_t size = 0;
 
     std::cout << "World size: " << size << " Voxels" << std::endl;
     std::cout << "=> " << size * 12 << " triangles" << std::endl;
@@ -178,13 +180,17 @@ void VoxelEngine::updateVBO()
     for (size_t i = 0; i < world_.size(); ++i)
     {
         Voxel v = world_.getVoxel(i);
-        array[i * 3] = v.getx();
-        array[i * 3 + 1] = v.gety();
-        array[i * 3 + 2] = v.getz();
+        // if (frustum_.culling(v.getPos()))
+        // {
+            array[i * 3] = v.getx();
+            array[i * 3 + 1] = v.gety();
+            array[i * 3 + 2] = v.getz();
+            ++size;
+        // }
     }
 
     // Fill VBO with cube vertices
-    glBufferData(GL_ARRAY_BUFFER, size * sizeof (float), array, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 3 * size * sizeof (float), array, GL_STATIC_DRAW);
     delete [] array;
 }
 

@@ -142,6 +142,8 @@ class Camera
           */
         glm::mat4 view() const;
 
+        float ratio() const { return _viewportAspectRatio; }
+
     private:
         glm::vec3 _position;
         float _horizontalAngle;

@@ -92,6 +92,12 @@ void GLProgram::addShader(const char* file, GLenum type)
     glAttachShader(program_, shader);
 }
 
+void GLProgram::addUniform(const char* name, glm::vec3 vec)
+{
+    GLuint location = glGetUniformLocation(program_, name);
+    glUniform3f(location, vec.x, vec.y, vec.z);
+}
+
 void GLProgram::addUniform(const char* name, glm::mat4 mat)
 {
     GLuint location = glGetUniformLocation(program_, name);

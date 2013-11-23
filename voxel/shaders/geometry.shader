@@ -11,6 +11,7 @@ out vec4 gsColor;
 
 // Projection matrix
 uniform mat4 mvp;
+uniform vec3 normal;
 
 void main ()
 {
@@ -32,68 +33,92 @@ void main ()
     );
 
     // Front
-    gl_Position = transVertices[0];
-    EmitVertex();
-    gl_Position = transVertices[1];
-    EmitVertex();
-    gl_Position = transVertices[2];
-    EmitVertex();
-    gl_Position = transVertices[3];
-    EmitVertex();
-    EndPrimitive();
+    // (n.x * 0 + n.y * 0 + n.z * -1)
+    if (normal.z >= 0)
+    {
+        gl_Position = transVertices[0];
+        EmitVertex();
+        gl_Position = transVertices[1];
+        EmitVertex();
+        gl_Position = transVertices[2];
+        EmitVertex();
+        gl_Position = transVertices[3];
+        EmitVertex();
+        EndPrimitive();
+    }
 
     // Right
-    gl_Position = transVertices[7];
-    EmitVertex();
-    gl_Position = transVertices[6];
-    EmitVertex();
-    gl_Position = transVertices[3];
-    EmitVertex();
-    gl_Position = transVertices[2];
-    EmitVertex();
-    EndPrimitive();
+    // (n.x * 0 + n.y * 1 + n.z * 0)
+    if (normal.x <= 0)
+    {
+        gl_Position = transVertices[7];
+        EmitVertex();
+        gl_Position = transVertices[6];
+        EmitVertex();
+        gl_Position = transVertices[3];
+        EmitVertex();
+        gl_Position = transVertices[2];
+        EmitVertex();
+        EndPrimitive();
+    }
 
     // Back
-    gl_Position = transVertices[7];
-    EmitVertex();
-    gl_Position = transVertices[5];
-    EmitVertex();
-    gl_Position = transVertices[6];
-    EmitVertex();
-    gl_Position = transVertices[4];
-    EmitVertex();
-    EndPrimitive();
+    // (n.x * 0 + n.y * 0 + n.z * 1)
+    if (normal.z <= 0)
+    {
+        gl_Position = transVertices[7];
+        EmitVertex();
+        gl_Position = transVertices[5];
+        EmitVertex();
+        gl_Position = transVertices[6];
+        EmitVertex();
+        gl_Position = transVertices[4];
+        EmitVertex();
+        EndPrimitive();
+    }
 
     // Bottom
-    gl_Position = transVertices[4];
-    EmitVertex();
-    gl_Position = transVertices[0];
-    EmitVertex();
-    gl_Position = transVertices[6];
-    EmitVertex();
-    gl_Position = transVertices[2];
-    EmitVertex();
-    EndPrimitive();
+    // (n.x * 0 + n.y * -1 + n.z * 0)
+    if (normal.y >= 0)
+    {
+        gl_Position = transVertices[4];
+        EmitVertex();
+        gl_Position = transVertices[0];
+        EmitVertex();
+        gl_Position = transVertices[6];
+        EmitVertex();
+        gl_Position = transVertices[2];
+        EmitVertex();
+        EndPrimitive();
+    }
 
     // Left
-    gl_Position = transVertices[1];
-    EmitVertex();
-    gl_Position = transVertices[0];
-    EmitVertex();
-    gl_Position = transVertices[5];
-    EmitVertex();
-    gl_Position = transVertices[4];
-    EmitVertex();
-    EndPrimitive();
+    // (n.x * -1 + n.y * 0 + n.z * 0)
+    if (normal.x >= 0)
+    {
+        gl_Position = transVertices[1];
+        EmitVertex();
+        gl_Position = transVertices[0];
+        EmitVertex();
+        gl_Position = transVertices[5];
+        EmitVertex();
+        gl_Position = transVertices[4];
+        EmitVertex();
+        EndPrimitive();
+    }
 
     // Top
-    gl_Position = transVertices[3];
-    EmitVertex();
-    gl_Position = transVertices[1];
-    EmitVertex();
-    gl_Position = transVertices[7];
-    EmitVertex();
-    gl_Position = transVertices[5];
-    EmitVertex();
-    EndPrimitive();
+    // (n.x * 1 + n.y * 0 + n.z * 0)
+    if (normal.y <= 0)
+    {
+        gl_Position = transVertices[3];
+        EmitVertex();
+        gl_Position = transVertices[1];
+        EmitVertex();
+        gl_Position = transVertices[7];
+        EmitVertex();
+        gl_Position = transVertices[5];
+        EmitVertex();
+        EndPrimitive();
+    }
 }
