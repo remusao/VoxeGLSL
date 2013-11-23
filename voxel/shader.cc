@@ -115,7 +115,6 @@ void GLProgram::finalize()
 {
     glBindFragDataLocation(program_, 0, "color");
     glLinkProgram(program_);
-    glUseProgram(program_);
 
     // Check linking
     GLint status;
@@ -128,4 +127,6 @@ void GLProgram::finalize()
         std::cerr << log << std::endl;
         throw ShaderException();
     }
+
+    glUseProgram(program_);
 }

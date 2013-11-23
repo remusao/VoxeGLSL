@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
                 unsigned low = lowest(i, j, height);
                 for (unsigned z = low; z <= height; ++z)
                 {
-                    world.addVoxel(Voxel(i, z, j));
+                    world.addVoxel(Voxel(i - size.x / 2.0, z, j - size.y / 2.0));
                 }
             }
         }
@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
     // -> false: keep previous world
     engine.loop([](World&) -> bool
     {
-        return false;
+        return true;
     });
 
     return 0;

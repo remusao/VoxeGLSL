@@ -19,6 +19,7 @@ namespace
 
 VoxelEngine::VoxelEngine(const char* name, int width, int height)
     : window_(sf::VideoMode(width, height), name, sf::Style::Default, sf::ContextSettings(32)),
+      wireframe_(GL_FILL),
       modelMatrix_(glm::scale(glm::mat4(1.0f), glm::vec3(0.5f)))
 {
     // Window options
@@ -31,6 +32,9 @@ VoxelEngine::VoxelEngine(const char* name, int width, int height)
     // Specify options to OpenGL
     glEnable(GL_DEPTH_TEST);
     glDepthFunc (GL_LESS);
+    glDepthMask(GL_TRUE);
+    glEnable(GL_CULL_FACE);
+    glDisable(GL_BLEND);
 
     // Print infos about OpenGL version
     print_opengl_info();
@@ -86,6 +90,11 @@ void VoxelEngine::loop(std::function<bool(World&)> update)
                     running = false;
                     break;
                 }
+                else if (event.key.code == sf::Keyboard::Space)
+                {
+                    glPolygonMode(GL_FRONT_AND_BACK, wireframe_);
+                    wireframe_ = (wireframe_ == GL_FILL ? GL_LINE : GL_FILL);
+                }
             }
         }
 
@@ -99,8 +108,8 @@ void VoxelEngine::loop(std::function<bool(World&)> update)
         }
 
         // frame per second
-        // float fps = 1.f / (time.asSeconds() - elapsed.asSeconds());
-        // std::cout << fps << std::endl;
+        float fps = 1.f / (time.asSeconds() - elapsed.asSeconds());
+        std::cout << fps << std::endl;
 
         // Update elapsed time
         elapsed = time;

@@ -49,6 +49,7 @@ class VoxelEngine
 
         // Shaders
         GLProgram program_;
+        GLenum    wireframe_;
 
         // World
         World world_;
