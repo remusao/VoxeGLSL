@@ -10,7 +10,7 @@ class Frustum
         ~Frustum() = default;
 
         void setCamInternals(float angle, float ratio, float nearD, float farD);
-        void setCamDef(glm::vec3 p, glm::vec3 l, glm::vec3 u);
+        void setCamDef(glm::vec3 p, glm::vec3 forward, glm::vec3 up, glm::vec3 right);
         bool culling(const glm::vec3 &p);
     private:
         glm::vec3 cc_; // camera position

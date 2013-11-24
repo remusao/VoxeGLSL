@@ -100,7 +100,7 @@ void VoxelEngine::loop(std::function<bool(World&)> update)
 
         // Update frustum
         frustum_.setCamInternals(camera_.fieldOfViewR(), camera_.ratio(), camera_.nearPlane(), camera_.farPlane());
-        frustum_.setCamDef(camera_.position(), camera_.forward(), camera_.up());
+        frustum_.setCamDef(camera_.position(), camera_.forward(), camera_.up(), camera_.right());
 
         // Update world
         if (update(world_))
@@ -120,7 +120,6 @@ void VoxelEngine::loop(std::function<bool(World&)> update)
 
         // Update model view projection matrix
         program_.addUniform("mvp", camera_.matrix() * modelMatrix_);
-        program_.addUniform("normal", camera_.forward());
 
         // Draw
         glClearColor(0.4f, 0.6f, 0.9f, 0.0f);
@@ -173,9 +172,6 @@ void VoxelEngine::updateVBO()
     float* array = new float[world_.size() * 3];
     size_t size = 0;
 
-    std::cout << "World size: " << size << " Voxels" << std::endl;
-    std::cout << "=> " << size * 12 << " triangles" << std::endl;
-
     // For each cube push its position
     for (size_t i = 0; i < world_.size(); ++i)
     {
@@ -188,6 +184,10 @@ void VoxelEngine::updateVBO()
             ++size;
        }
     }
+
+    std::cout << "World size: " << size << " Voxels" << std::endl;
+    std::cout << "=> " << size * 12 << " triangles" << std::endl;
+
 
     // Fill VBO with cube vertices
     glBufferData(GL_ARRAY_BUFFER, 3 * size * sizeof (float), array, GL_STATIC_DRAW);

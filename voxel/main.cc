@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
     // -> false: keep previous world
     engine.loop([](World&) -> bool
     {
-        return false;
+        return true;
     });
 
     return 0;
