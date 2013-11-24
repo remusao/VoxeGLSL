@@ -99,8 +99,8 @@ void VoxelEngine::loop(std::function<bool(World&)> update)
         processInput(elapsed.asSeconds());
 
         // Update frustum
-        // frustum_.setCamInternals(camera_.fieldOfView(), camera_.viewportAspectRatio(), camera_.nearPlane(), camera_.farPlane());
-        // frustum_.setCamDef(camera_.position(), glm::vec3(0.0f, 0.0f, 0.0f), camera_.up());
+        frustum_.setCamInternals(camera_.fieldOfViewR(), camera_.ratio(), camera_.nearPlane(), camera_.farPlane());
+        frustum_.setCamDef(camera_.position(), camera_.forward(), camera_.up());
 
         // Update world
         if (update(world_))
@@ -180,13 +180,13 @@ void VoxelEngine::updateVBO()
     for (size_t i = 0; i < world_.size(); ++i)
     {
         Voxel v = world_.getVoxel(i);
-        // if (frustum_.culling(v.getPos()))
-        // {
-            array[i * 3] = v.getx();
-            array[i * 3 + 1] = v.gety();
-            array[i * 3 + 2] = v.getz();
+       if (frustum_.culling(v.getPos()))
+       {
+            array[size * 3] = v.getx();
+            array[size * 3 + 1] = v.gety();
+            array[size * 3 + 2] = v.getz();
             ++size;
-        // }
+       }
     }
 
     // Fill VBO with cube vertices

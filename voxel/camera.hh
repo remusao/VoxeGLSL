@@ -50,6 +50,7 @@ class Camera
           The value must be between 0 and 180.
           */
         float fieldOfView() const;
+        float fieldOfViewR() const;
         void setFieldOfView(float fieldOfView);
 
         /**

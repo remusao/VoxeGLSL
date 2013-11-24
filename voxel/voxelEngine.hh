@@ -12,6 +12,7 @@
 # include <glm/glm.hpp>
 # include <glm/gtc/matrix_transform.hpp>
 
+# include "frustum.hh"
 # include "camera.hh"
 # include "shader.hh"
 # include "world.hh"
@@ -42,6 +43,7 @@ class VoxelEngine
 
         // Camera
         Camera camera_;
+        Frustum frustum_;
 
         // Buffers
         GLuint vao_;

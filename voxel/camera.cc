@@ -26,6 +26,11 @@ static inline float RadiansToDegrees(float radians) {
     return radians * 180.0f / (float)M_PI;
 }
 
+static inline float DegreesToRadians(float degrees)
+{
+    return degrees * 0.0174532925;
+}
+
 
 Camera::Camera() :
     _position(0.0f, 0.0f, 1.0f),
@@ -48,6 +53,10 @@ void Camera::setPosition(const glm::vec3& position) {
 
 void Camera::offsetPosition(const glm::vec3& offset) {
     _position += offset;
+}
+
+float Camera::fieldOfViewR() const {
+    return DegreesToRadians(_fieldOfView);
 }
 
 float Camera::fieldOfView() const {
