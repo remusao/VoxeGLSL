@@ -22,7 +22,7 @@ void main()
     BoundingBox[6] = mvp * (gl_Position + vec4( 1.0,-1.0,-1.0, 1.0));
     BoundingBox[7] = mvp * (gl_Position + vec4(-1.0,-1.0,-1.0, 1.0));
 
-    /* check how the bounding box resides regarding to the view frustum */   
+    /* check how the bounding box resides regarding to the view frustum */
     int outOfBounds[6] = int[6](0, 0, 0, 0, 0, 0);
 
     for (int i = 0; i < 8; ++i)
@@ -36,14 +36,10 @@ void main()
     }
 
     bool inFrustum = true;
-
-    for (int i = 0; i < 6; ++i)
-    {
-        if (outOfBounds[i] == 8)
-        {
-            inFrustum = false;
-        }
-    }
-
-    visible = inFrustum ? 1 : 0;
+    visible = (outOfBounds[0] != 8
+            && outOfBounds[1] != 8
+            && outOfBounds[2] != 8
+            && outOfBounds[3] != 8
+            && outOfBounds[4] != 8
+            && outOfBounds[5] != 8) ? 1 : 0;
 }
