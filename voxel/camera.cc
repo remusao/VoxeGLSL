@@ -114,7 +114,7 @@ void Camera::setViewportAspectRatio(float viewportAspectRatio) {
 }
 
 glm::vec3 Camera::forward() const {
-    glm::vec4 forward = glm::inverse(orientation()) * glm::vec4(0,0,1,1);
+    glm::vec4 forward = glm::inverse(orientation()) * glm::vec4(0,0,-1,1);
     return glm::vec3(forward);
 }
 
