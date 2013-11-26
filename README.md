@@ -18,3 +18,7 @@ make
 * `A`, `D` => Left and Right
 * `Z`, `X` => Up and downd
 * `Arrows` => Rotate arround
+
+# Example
+
+![demo](voxel.png)
