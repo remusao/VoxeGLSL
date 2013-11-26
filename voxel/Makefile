@@ -3,11 +3,11 @@ CXXFLAGS=-std=c++11 -march=native -Ofast -Wall -Wextra -pedantic
 LINKAGE=-lsfml-system -lsfml-graphics -lsfml-window -lGL $(shell pkg-config --cflags --libs glew)
 
 SRC=main.cc voxelEngine.cc shader.cc camera.cc
-BINARY=lie
+BINARY=voxel
 
-.PHONY: lie
+.PHONY: voxel
 
-all: lie
+all: voxel
 
-lie:
+voxel:
 	${CXX} ${CXXFLAGS} -o ${BINARY} ${SRC} ${LINKAGE}
